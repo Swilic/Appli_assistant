@@ -2,12 +2,19 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Ellipse?>
 
-<VBox alignment="CENTER" spacing="20" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="com.tonnom.lifemanager.Chrono">
+<VBox alignment="CENTER" spacing="20" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tonnom.lifemanager.Chrono">
+   <StackPane prefHeight="150.0" prefWidth="200.0">
+      <children>
+         <Ellipse fill="DODGERBLUE" radiusX="75.0" radiusY="52.0" stroke="BLACK" strokeType="INSIDE" />
+      
+          <Label fx:id="chronoLabel" alignment="CENTER" prefHeight="42.0" prefWidth="80.0" text="0 : 0 " />
+      </children>
+   </StackPane>
 
-    <Label fx:id="chronoLabel" text="0 : 0 " />
-
-    <Button onAction="#handleStart" text="GO" />
+          <Button onAction="#handleStart" text="GO" />
 
 </VBox>

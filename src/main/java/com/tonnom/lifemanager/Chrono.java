@@ -1,50 +1,54 @@
 package com.tonnom.lifemanager;
 
-import javafx.util.Duration;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import java.time.Instant;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import java.util.List;
-import java.util.ArrayList;
+import javafx.util.Duration;
 
 public class Chrono {
 
-    @FXML
-    private Label chronoLabel;
-    private  Instant debut;
-    private Timeline timeline;
-    private int seconds = 0;
+    @FXML private Label chronoLabel;
+    private Timeline rafraichisseurVisuel; // Boucle locale d'affichage
 
+    // Cette méthode s'exécute automatiquement à chaque fois que l'onglet s'affiche
     @FXML
-    private java.util.List<Long> time(long secondes){
-        List<Long> time = new ArrayList<>(List.of(0L, 0L));
-        if (secondes < 60){
-            time.set(0, 0L);
-            time.set(1, secondes);
+    public void initialize() {
+        // 1. On affiche direct la valeur actuelle (ex: si on revient d'un autre onglet)
+        mettreAJourLeTexte();
+
+        // 2. Si le moteur tourne, on lance la boucle qui rafraîchit le Label
+        if (TimeManager.getInstance().estEnMarche()) {
+            lancerBoucleAffichage();
         }
-        else{
-            time.set(1, secondes % 60);
-            time.set(0, secondes/60);
-        }
-        return time;
     }
+
     @FXML
     private void handleStart() {
-        debut = Instant.now();
-        if (timeline != null) timeline.stop();
-        timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-            java.time.Duration res = java.time.Duration.between(debut, Instant.now());
-            long secondes = res.getSeconds();
-            List<Long> actual_time = time(secondes);
-            chronoLabel.setText(actual_time.get(0) + " : " + actual_time.get(1));
-        }));
+        // On donne l'ordre au moteur de démarrer
+        TimeManager.getInstance().demarrer();
+        // On lance la mise à jour visuelle du Label
+        lancerBoucleAffichage();
+    }
 
-        // On dit à la timeline de se répéter indéfiniment
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
+    private void lancerBoucleAffichage() {
+        if (rafraichisseurVisuel != null) rafraichisseurVisuel.stop();
+
+        // On crée une petite boucle qui demande l'heure au moteur 2 fois par seconde
+        rafraichisseurVisuel = new Timeline(new KeyFrame(Duration.seconds(0.5), event -> {
+            mettreAJourLeTexte();
+        }));
+        rafraichisseurVisuel.setCycleCount(Animation.INDEFINITE);
+        rafraichisseurVisuel.play();
+    }
+
+    private void mettreAJourLeTexte() {
+        long totalSecs = TimeManager.getInstance().getSecondesEcoulees();
+        long mins = totalSecs / 60;
+        long secs = totalSecs % 60;
+        // On met à jour le Label sur l'écran
+        chronoLabel.setText(String.format("%d : %02d", mins, secs));
     }
 }
 /*
